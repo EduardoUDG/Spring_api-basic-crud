@@ -3,9 +3,12 @@ package com.company.api.controllers;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.company.api.models.Product;
 import com.company.api.pojo.Response;
 import com.company.api.services.ProductService;
+import com.company.api.services.ValidationService;
 
 @CrossOrigin
 @RestController
@@ -27,6 +31,9 @@ public class ProductController {
 
 	@Autowired
 	private ProductService productService;
+	
+	@Autowired
+	private ValidationService validationService;
 	
 	@GetMapping("/products")
 	public ResponseEntity<?> getProducts() {
@@ -53,7 +60,8 @@ public class ProductController {
 	}
 	
 	@PostMapping("/products")
-	public ResponseEntity<?> createProduct(@RequestBody Product product) {
+	public ResponseEntity<?> createProduct(@Valid @RequestBody Product product, BindingResult result) {
+        if (result.hasErrors()) return this.validationService.bodyErrorResponse(result);
 		try {
 			Product productCreated = this.productService.save(product);
 			return new ResponseEntity<>(new Response(true, "created", productCreated),HttpStatus.OK);
@@ -63,7 +71,8 @@ public class ProductController {
 	}
 	
 	@PutMapping("/products/{id}")
-	public ResponseEntity<?> getProductById(@PathVariable("id") Long id, @RequestBody Product product) {
+	public ResponseEntity<?> getProductById(@PathVariable("id") Long id,@Valid @RequestBody Product product, BindingResult result) {
+		if (result.hasErrors()) return this.validationService.bodyErrorResponse(result);
 		try {
 			Product dbProduct = this.productService.findById(id);
 			if( dbProduct == null ) {

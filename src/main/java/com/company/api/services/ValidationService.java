@@ -1,0 +1,25 @@
+package com.company.api.services;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+import org.springframework.validation.BindingResult;
+
+import com.company.api.helpers.ValidationMessages;
+import com.company.api.pojo.Response;
+
+@Service
+public class ValidationService {
+
+	public ResponseEntity<?> bodyErrorResponse(BindingResult result) {
+		List<String> errors = result.getFieldErrors()
+				.stream()
+				.map( err -> ValidationMessages.ERROR_MESSAGE_PREFIX + " " + err.getObjectName() + " '" + err.getField() +"' " + err.getDefaultMessage() )
+				.collect(Collectors.toList());
+		return new ResponseEntity<>(new Response(false, "error", errors), HttpStatus.BAD_REQUEST);
+	}
+
+}

@@ -26,7 +26,7 @@ import com.company.api.services.ValidationService;
 
 @CrossOrigin
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping("/v1/api")
 public class ProductController {
 
 	@Autowired
@@ -74,6 +74,7 @@ public class ProductController {
 	@PutMapping("/products/{id}")
 	public ResponseEntity<?> getProductById(@PathVariable("id") Long id,@Valid @RequestBody Product product, BindingResult result) {
 		if (result.hasErrors()) return this.validationService.bodyErrorResponse(result);
+		if ( !id.equals(product.getId()) ) return this.validationService.idIsNotEqualBodyResponse();
 		try {
 			Product dbProduct = this.productService.findById(id);
 			if( dbProduct == null ) return this.validationService.idNotFoundResponse(id);

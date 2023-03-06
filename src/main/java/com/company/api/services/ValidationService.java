@@ -35,4 +35,9 @@ public class ValidationService {
 		return new ResponseEntity<>(new Response(true, message, array),HttpStatus.OK);
 	}
 	
+	public ResponseEntity<?> idIsNotEqualBodyResponse() {
+		List<String> array = Arrays.asList("El id de la parámetro y del body no son iguales");
+		return new ResponseEntity<>(new Response(false, "error", array),HttpStatus.OK);
+	}
+	
 }

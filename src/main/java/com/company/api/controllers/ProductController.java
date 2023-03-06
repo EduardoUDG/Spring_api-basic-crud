@@ -39,6 +39,8 @@ public class ProductController {
 	public ResponseEntity<?> getProducts() {
 		try {
 			List<Product> products = this.productService.findAll();
+			if(products.isEmpty() ) return this.validationService.emptyDataResponse();
+			
 			return new ResponseEntity<>(new Response(true, "success", products),HttpStatus.OK);
 		} catch (Exception e) {
 			return new ResponseEntity<>(new Response(false, "error", null), HttpStatus.INTERNAL_SERVER_ERROR);
@@ -48,11 +50,10 @@ public class ProductController {
 	@GetMapping("/products/{id}")
 	public ResponseEntity<?> getProductById(@PathVariable("id") Long id) {
 		try {
-			Product product = this.productService.findById(id);
-			if( product == null ) {
-				return new ResponseEntity<>(new Response(false, "id: "+id+" not found", null),HttpStatus.OK);
-			}
-			List<Product> productArr = Arrays.asList(product);
+			Product dbProduct = this.productService.findById(id);
+			if( dbProduct == null ) return this.validationService.idNotFoundResponse(id);
+			
+			List<Product> productArr = Arrays.asList(dbProduct);
 			return new ResponseEntity<>(new Response(true, "success", productArr),HttpStatus.OK);
 		} catch (Exception e) {
 			return new ResponseEntity<>(new Response(false, "error", null), HttpStatus.INTERNAL_SERVER_ERROR);
@@ -75,9 +76,8 @@ public class ProductController {
 		if (result.hasErrors()) return this.validationService.bodyErrorResponse(result);
 		try {
 			Product dbProduct = this.productService.findById(id);
-			if( dbProduct == null ) {
-				return new ResponseEntity<>(new Response(false, "id: "+id+" not found", null),HttpStatus.OK);
-			}
+			if( dbProduct == null ) return this.validationService.idNotFoundResponse(id);
+			
 			dbProduct = dbProduct.updatetProduct(product);
 			dbProduct.setId(id);
 			
@@ -93,9 +93,8 @@ public class ProductController {
 	public ResponseEntity<?> deleteProductById(@PathVariable("id") Long id) {
 		try {
 			Product dbProduct = this.productService.findById(id);
-			if( dbProduct == null ) {
-				return new ResponseEntity<>(new Response(false, "id: "+id+" not found", null),HttpStatus.OK);
-			}
+			if( dbProduct == null ) return this.validationService.idNotFoundResponse(id);
+			
 			this.productService.deleteById(id);
 			List<Product> productDeleted = Arrays.asList(dbProduct);
 			return new ResponseEntity<>(new Response(true, "deleted", productDeleted),HttpStatus.OK);

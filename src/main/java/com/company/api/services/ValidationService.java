@@ -1,5 +1,7 @@
 package com.company.api.services;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,4 +24,15 @@ public class ValidationService {
 		return new ResponseEntity<>(new Response(false, "error", errors), HttpStatus.BAD_REQUEST);
 	}
 
+	public ResponseEntity<?> idNotFoundResponse(Long id) {
+		var message = Arrays.asList("El id: "+id+" no existe en la base de datos");
+		return new ResponseEntity<>(new Response(false, "error", message),HttpStatus.OK);
+	}
+	
+	public ResponseEntity<?> emptyDataResponse() {
+		String message = "La base de datos está vacía";
+		List<?> array = new ArrayList<>();
+		return new ResponseEntity<>(new Response(true, message, array),HttpStatus.OK);
+	}
+	
 }
